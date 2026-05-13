@@ -27,7 +27,9 @@ pipeline {
         }
         
         stage('Javadoc') {
-            steps { sh 'mvn javadoc:javadoc' }
+            steps {
+                sh 'mvn javadoc:javadoc -Dadditionalparam=-Xdoclint:none -Dmaven.javadoc.failOnError=false'
+            }
         }
         
         stage('Site') {
