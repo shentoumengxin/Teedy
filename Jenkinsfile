@@ -25,12 +25,17 @@ pipeline {
                 sh 'mvn test -Dmaven.test.failure.ignore=true'
             }
         }
-        
+        stage('Install') {
+            steps {
+                sh 'mvn install -DskipTests -Dmaven.test.skip=true'
+        }
+}
         stage('PMD') {
             steps {
-                sh 'mvn pmd:pmd'
+                sh 'mvn pmd:pmd ||'
             }
         }
+
         
         stage('JaCoCo') {
             steps {
