@@ -3,74 +3,47 @@ pipeline {
     
     stages {
         stage('Checkout SCM') {
-            steps {
-                checkout scm
-            }
+            steps { checkout scm }
         }
         
         stage('Clean') {
-            steps {
-                sh 'mvn clean'
-            }
+            steps { sh 'mvn clean' }
         }
         
         stage('Compile') {
-            steps {
-                sh 'mvn clean install -DskipTests -Dpmd.skip=true -U'
-            }
+            steps { sh 'mvn install -DskipTests -Dpmd.skip=true -U' }
         }
         
         stage('Test') {
-            steps {
-                sh 'mvn test -Dmaven.test.failure.ignore=true'
-            }
+            steps { sh 'mvn test -Dmaven.test.failure.ignore=true' }
         }
-        stage('Install') {
-            steps {
-                sh 'mvn install -DskipTests -Dmaven.test.skip=true'
-        }
-}
+        
         stage('PMD') {
-            steps {
-                sh 'mvn pmd:pmd ||'
-            }
+            steps { sh 'mvn pmd:pmd' }
         }
-
         
         stage('JaCoCo') {
-            steps {
-                sh 'mvn jacoco:report'
-            }
+            steps { sh 'mvn jacoco:report' }
         }
         
         stage('Javadoc') {
-            steps {
-                sh 'mvn javadoc:javadoc'
-            }
+            steps { sh 'mvn javadoc:javadoc' }
         }
         
         stage('Site') {
-            steps {
-                sh 'mvn site'
-            }
+            steps { sh 'mvn site' }
         }
         
         stage('Package') {
-            steps {
-                sh 'mvn package -DskipTests'
-            }
+            steps { sh 'mvn package -DskipTests -Dpmd.skip=true' }
         }
     }
     
     post {
         always {
-            // 归档站点文档
             archiveArtifacts artifacts: '**/target/site/**/*.*', fingerprint: true
-            // 归档 JAR
             archiveArtifacts artifacts: '**/target/**/*.jar', fingerprint: true
-            // 归档 WAR
             archiveArtifacts artifacts: '**/target/**/*.war', fingerprint: true
-            // 发布测试结果
             junit '**/target/surefire-reports/*.xml'
         }
     }
